@@ -16,7 +16,7 @@ struct
     int countUpdates = 0;
 } GameState;
 
-std::vector<std::vector<bool>> grid(WIDTH, std::vector<bool>(HEIGHT, false));
+std::vector<std::vector<bool>> gameField(WIDTH, std::vector<bool>(HEIGHT, false));
 
 const char* CLASS_NAME = "GameOfLifeWindow";
 
@@ -42,12 +42,12 @@ void UpdateGrid()
                     int nx = (x + dx + WIDTH) % WIDTH;
                     int ny = (y + dy + HEIGHT) % HEIGHT;
 
-                    if (grid[nx][ny])
+                    if (gameField[nx][ny])
                         liveNeighbors++;
                 }
             }
             
-            if (grid[x][y])
+            if (gameField[x][y])
             {
                 if (liveNeighbors == 2 || liveNeighbors == 3)
                     newGrid[x][y] = true;
@@ -62,16 +62,16 @@ void UpdateGrid()
         }
     }
 
-    grid = std::move(newGrid);
+    gameField = std::move(newGrid);
 }
 
-void InitField()
+void RandomizeField()
 {
     for (int x = 0; x < WIDTH; ++x)
     {
         for (int y = 0; y < HEIGHT; ++y)
         {
-            grid[x][y] = (rand() % 50) % 2 == 0;
+            gameField[x][y] = (rand() % 50) % 2 == 0;
         }
     }
 }
@@ -82,7 +82,7 @@ void DrawGrid(HDC hdc)
     {
         for (int y = 0; y < HEIGHT; ++y)
         {
-            if (grid[x][y])
+            if (gameField[x][y])
             {
                 RECT rect{ x * CELL_SIZE, y * CELL_SIZE, (x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE };
                 FillRect(hdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH));
@@ -112,7 +112,7 @@ bool HasPeriodicConfiguration()
         {
             for (int y = 0; y < HEIGHT; ++y)
             {
-                if (grid[x][y] != prevState[x][y])
+                if (gameField[x][y] != prevState[x][y])
                 {
                     match = false;
                     break;
@@ -127,7 +127,7 @@ bool HasPeriodicConfiguration()
             return true;
     }
 
-    previousStates.push_back(grid);
+    previousStates.push_back(gameField);
 
     if (previousStates.size() > 5)
         previousStates.pop_front();
@@ -151,7 +151,7 @@ bool HasOneCellAlive()
     {
         for (int y = 0; y < HEIGHT; ++y)
         {
-            if (grid[x][y])
+            if (gameField[x][y])
                 return true;
         }
     }
@@ -207,17 +207,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     if (GameState.isPaused)
                         KillTimer(hwnd, 1);
                     else
-                        SetTimer(hwnd, 1, speed, NULL);
+                        SetTimer(hwnd, 1, GameState.speed, NULL);
                     break;
                 case 'R':
-                    InitField();
+                    RandomizeField();
                     break;
                 case VK_UP:
                     GameState.speed -= 100;
                     if (GameState.speed < 100)
                         GameState.speed = 100;
 
-                    SetTimer(hwnd, 1, speed, NULL);
+                    SetTimer(hwnd, 1, GameState.speed, NULL);
                     break;
                 case VK_DOWN:
                     GameState.speed += 100;
@@ -234,7 +234,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             int xCell = xPos / CELL_SIZE;
             int yCell = yPos / CELL_SIZE;
 
-            grid[xCell][yCell] = !grid[xCell][yCell];
+            gameField[xCell][yCell] = !gameField[xCell][yCell];
 
             
             InvalidateRect(hwnd, nullptr, FALSE);
@@ -275,7 +275,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     ShowWindow(hwnd, nCmdShow);
 
-    InitField();
+    RandomizeField();
 
     SetTimer(hwnd, 1, GameState.speed, NULL);
 
