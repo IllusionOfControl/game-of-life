@@ -190,7 +190,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 MessageBox(hwnd, "Game over!", "Game over!", MB_OK);
             }
 
-            
             InvalidateRect(hwnd, nullptr, FALSE);
             return 0;
         }
@@ -204,7 +203,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             switch (wParam)
             {
                 case VK_SPACE:
-
                     GameState.isPaused = !GameState.isPaused;
                     if (GameState.isPaused)
                         KillTimer(hwnd, 1);
@@ -231,7 +229,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         case WM_LBUTTONDOWN:
         {
-
             int xPos = GET_X_LPARAM(lParam);
             int yPos = GET_Y_LPARAM(lParam);
             int xCell = xPos / CELL_SIZE;
@@ -250,9 +247,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    
     srand(time(NULL));
-
     
     WNDCLASS wc{};
     wc.lpfnWndProc = WindowProc;
@@ -267,7 +262,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             "Game of Life",           
             WS_OVERLAPPEDWINDOW,      
 
-            
             CW_USEDEFAULT, CW_USEDEFAULT, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,
 
             NULL,                     
