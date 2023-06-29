@@ -76,6 +76,11 @@ void RandomizeField()
     }
 }
 
+void ClearField()
+{
+    gameField = std::vector<std::vector<bool>>(WIDTH, std::vector<bool>(HEIGHT, false));
+}
+
 void DrawGrid(HDC hdc)
 {
     for (int x = 0; x < WIDTH; ++x)
@@ -212,6 +217,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 case 'R':
                     RandomizeField();
                     break;
+                case 'C':
+                    ClearField();
+                    KillTimer(hwnd, 1);
+                    GameState.isPaused = true;
                 case VK_UP:
                     GameState.speed -= 100;
                     if (GameState.speed < 100)
@@ -224,6 +233,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     if (GameState.speed > 10000)
                         GameState.speed = 10000;
                     break;
+                case VK_ESCAPE:
+                    PostQuitMessage(0);
             }
             return 0;
         }
@@ -260,10 +271,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             0,                        
             CLASS_NAME,               
             "Game of Life",           
-            WS_OVERLAPPEDWINDOW,      
-
+            WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,
-
             NULL,                     
             NULL,                     
             hInstance,                       
