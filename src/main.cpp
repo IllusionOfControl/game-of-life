@@ -1,9 +1,7 @@
 #include <Windows.h>
-#include <windowsx.h>
 #include <vector>
 #include <list>
 #include <random>
-#include <ctime>
 
 const int WIDTH = 40;
 const int HEIGHT = 40;
@@ -71,7 +69,7 @@ void RandomizeField()
     {
         for (int y = 0; y < HEIGHT; ++y)
         {
-            gameField[x][y] = (rand() % 50) % 2 == 0;
+            gameField[x][y] = (std::rand() % 50) % 2 == 0;
         }
     }
 }
@@ -240,13 +238,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         case WM_LBUTTONDOWN:
         {
-            int xPos = GET_X_LPARAM(lParam);
-            int yPos = GET_Y_LPARAM(lParam);
-            int xCell = xPos / CELL_SIZE;
-            int yCell = yPos / CELL_SIZE;
+            POINTS ptsCursor = MAKEPOINTS(lParam);
+            int xCell = ptsCursor.x / CELL_SIZE;
+            int yCell = ptsCursor.y / CELL_SIZE;
 
             gameField[xCell][yCell] = !gameField[xCell][yCell];
-
             
             InvalidateRect(hwnd, nullptr, FALSE);
             return 0;
@@ -258,12 +254,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    srand(time(NULL));
+    std::srand(std::time(NULL));
+
+    HCURSOR hCursorArrow = LoadCursor(NULL, IDC_ARROW);
     
     WNDCLASS wc{};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = CLASS_NAME;
+    wc.hCursor = hCursorArrow;
 
     RegisterClass(&wc);
 
